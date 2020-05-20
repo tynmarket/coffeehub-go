@@ -14,6 +14,12 @@ create() {
   gmigrate create -ext sql -dir db/migration -seq create_$1
 }
 
+help() {
+    echo "\n up\n\n \
+dow\n\n \
+create table_name \n"
+}
+
 case "$1" in
     "up")
         up
@@ -23,5 +29,8 @@ case "$1" in
     ;;
     "create")
         create $2
+    ;;
+    *)
+        help
     ;;
 esac
