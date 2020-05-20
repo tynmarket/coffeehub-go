@@ -3,15 +3,15 @@
 DATABSE_URL="mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(127.0.0.1:3306)/$MYSQL_DATABASE"
 
 up() {
-  gmigrate -database $DATABSE_URL -path db/migrations up
+  gmigrate -database $DATABSE_URL -path db/migration up
 }
 
 down() {
-  gmigrate -database $DATABSE_URL -path db/migrations down
+  gmigrate -database $DATABSE_URL -path db/migration down
 }
 
 create() {
-  gmigrate create -ext sql -dir db/migrations -seq create_$1
+  gmigrate create -ext sql -dir db/migration -seq create_$1
 }
 
 case "$1" in

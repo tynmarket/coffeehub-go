@@ -1,7 +1,7 @@
 package main
 
 import (
-	"tynmarket/coffeehub-go/controllers/api"
+	"tynmarket/coffeehub-go/controller/api"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,8 +9,8 @@ import (
 func main() {
 	r := gin.Default()
 
-	api_v1 := r.Group("/api")
-	api_v1.GET("/coffees", api.Coffees)
+	apiV1 := r.Group("/api")
+	apiV1.GET("/coffees", api.Coffees)
 
 	r.Run()
 }
