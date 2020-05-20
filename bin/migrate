@@ -1,0 +1,27 @@
+#!/bin/sh
+
+DATABSE_URL="mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(127.0.0.1:3306)/$MYSQL_DATABASE"
+
+up() {
+  gmigrate -database $DATABSE_URL -path db/migrations up
+}
+
+down() {
+  gmigrate -database $DATABSE_URL -path db/migrations down
+}
+
+create() {
+  gmigrate create -ext sql -dir db/migrations -seq create_$1
+}
+
+case "$1" in
+    "up")
+        up
+    ;;
+    "down")
+        down
+    ;;
+    "create")
+        create $2
+    ;;
+esac
