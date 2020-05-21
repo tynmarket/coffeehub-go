@@ -12,7 +12,8 @@ import (
 func Coffees(c *gin.Context) {
 	handle(c, func(db *gorm.DB) {
 		coffees := []model.Coffee{}
-		db.Preload("Site").Find(&coffees)
+		db = paginate(c, db)
+		db.Preload("Site").Order("id desc").Find(&coffees)
 
 		serialized := serializer.SerializeCoffees(coffees)
 

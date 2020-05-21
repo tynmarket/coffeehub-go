@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"strconv"
 	"tynmarket/coffeehub-go/model"
 
 	"github.com/gin-gonic/gin"
@@ -24,4 +25,9 @@ func handle(c *gin.Context, handlerFun func(db *gorm.DB)) {
 	db.LogMode(true)
 
 	handlerFun(db)
+}
+
+func paginate(c *gin.Context, db *gorm.DB) *gorm.DB {
+	page, _ := strconv.Atoi(c.Query("page"))
+	return db.Offset(page * 10).Limit(11)
 }
