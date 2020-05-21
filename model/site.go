@@ -1,5 +1,8 @@
+package model
+
+// Site is
 type Site struct {
-    Model
-    Name string
-	Url string
+	Model
+	Name string
+	URL  string
 }
