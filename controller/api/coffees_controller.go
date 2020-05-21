@@ -1,33 +1,22 @@
 package api
 
 import (
-	"fmt"
 	"tynmarket/coffeehub-go/model"
 	"tynmarket/coffeehub-go/serializer"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // Coffees index action
 func Coffees(c *gin.Context) {
-	db, err := model.Db()
+	handle(c, func(db *gorm.DB) {
+		coffees := []model.Coffee{}
+		db.Preload("Site").Find(&coffees)
 
-	if err != nil {
-		fmt.Println(err)
-		//os.Exit(1)
-		c.JSON(200, gin.H{
-			"message": "error",
-		})
-		return
-	}
+		serialized := serializer.SerializeCoffees(coffees)
 
-	defer db.Close()
-	db.LogMode(true)
+		c.JSON(200, serialized)
 
-	coffees := []model.Coffee{}
-	db.Preload("Site").Find(&coffees)
-
-	serialized := serializer.SerializeCoffees(coffees)
-
-	c.JSON(200, serialized)
+	})
 }
