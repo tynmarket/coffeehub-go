@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option go_package = "proto";
+
+service CoffeeProto {
+    rpc GetCoffee (GetCoffeeRequest) returns (GetCoffeeResponse) {}
+    rpc GetCoffees (GetCoffeesRequest) returns (GetCoffeesResponse) {}
+}
+
+message Coffee {
+    string area = 1;
+    string arrival_date = 2;
+    int32 arrival_month  = 3;
+    string country = 4;
+    bool new  = 5;
+    string roast = 6;
+    string roast_text = 7;
+    string shop = 8;
+    string taste = 9;
+    string url = 10;
+}
+
+message GetCoffeeRequest {
+    string coffee_id = 1;
+}
+
+message GetCoffeeResponse {
+    string name = 1;
+}
+
+message GetCoffeesRequest {
+}
+
+message GetCoffeesResponse {
+    repeated Coffee coffees = 1;
+}
