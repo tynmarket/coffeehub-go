@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/thoas/go-funk"
+)
 
 // Coffee is
 type Coffee struct {
@@ -14,8 +18,13 @@ type Coffee struct {
 	Taste         string
 }
 
-var coffeeRoastTextEn = [9]string{"unknown", "light", "cinnamon", "medium", "high", "city", "fullcity", "french", "italian"}
-var coffeeRoastText = [9]string{"記載なし", "ライト", "シナモン", "ミディアム", "ハイ", "シティ", "フルシティ", "フレンチ", "イタリアン"}
+var coffeeRoastTextEn = []string{"unknown", "light", "cinnamon", "medium", "high", "city", "fullcity", "french", "italian"}
+var coffeeRoastText = []string{"記載なし", "ライト", "シナモン", "ミディアム", "ハイ", "シティ", "フルシティ", "フレンチ", "イタリアン"}
+
+// CoffeeRoastValue is
+func CoffeeRoastValue(roast string) int {
+	return funk.IndexOf(coffeeRoastTextEn, roast)
+}
 
 // ArrivalDate is
 func (c *Coffee) ArrivalDate() string {
