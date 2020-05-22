@@ -36,9 +36,9 @@ func runGinServer() {
 
 	apiV1 := r.Group("/api")
 	apiV1.GET("/coffees", api.Coffees)
+	apiV1.GET("/coffees/roast/:roast", api.CoffeesRoast)
 
 	r.Run()
-
 }
 
 type server struct {

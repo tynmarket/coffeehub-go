@@ -18,7 +18,7 @@ type Coffee struct {
 	URL          string `json:"url"`
 }
 
-// SerializeCoffees is
+// SerializeCoffees is, TODO pointer
 func SerializeCoffees(coffees []model.Coffee) []Coffee {
 	array := []Coffee{}
 
