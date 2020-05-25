@@ -2,9 +2,15 @@ syntax = "proto3";
 
 option go_package = "proto";
 
+import "google/api/annotations.proto";
+
 service CoffeeProto {
     rpc GetCoffee (GetCoffeeRequest) returns (GetCoffeeResponse) {}
-    rpc GetCoffees (GetCoffeesRequest) returns (GetCoffeesResponse) {}
+    rpc GetCoffees (GetCoffeesRequest) returns (GetCoffeesResponse) {
+        option (google.api.http) = {
+            get: "/grpc/coffees"
+        };
+    }
 }
 
 message Coffee {

@@ -1,0 +1,128 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "proto/coffee.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/grpc/coffees": {
+      "get": {
+        "operationId": "CoffeeProto_GetCoffees",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/GetCoffeesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "CoffeeProto"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Coffee": {
+      "type": "object",
+      "properties": {
+        "area": {
+          "type": "string"
+        },
+        "arrival_date": {
+          "type": "string"
+        },
+        "arrival_month": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "country": {
+          "type": "string"
+        },
+        "new": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "roast": {
+          "type": "string"
+        },
+        "roast_text": {
+          "type": "string"
+        },
+        "shop": {
+          "type": "string"
+        },
+        "taste": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "GetCoffeeResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "GetCoffeesResponse": {
+      "type": "object",
+      "properties": {
+        "coffees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Coffee"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}
