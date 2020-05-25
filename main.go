@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"time"
 	"tynmarket/coffeehub-go/controller/api"
 	pb "tynmarket/coffeehub-go/proto"
 
 	"github.com/gin-gonic/gin"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
 
@@ -20,16 +22,25 @@ func main() {
 
 	fmt.Printf("\narg: %s\n\n", arg)
 
-	if arg == "grpc" {
+	if arg == "gateway" {
+		fmt.Println("Run gRPC gateway")
+		runGrpcGateway()
+	} else if arg == "grpc" {
 		fmt.Println("Run gRPC server")
 		runGrpcServer()
 	} else if arg == "client" {
 		fmt.Println("Run gRPC client")
 		runClient()
 	} else {
+		fmt.Print("Run gin server\n\n")
 		runGinServer()
 	}
 }
+
+const (
+	port     = ":8080"
+	grpcPort = ":50051"
+)
 
 func runGinServer() {
 	r := gin.Default()
@@ -45,8 +56,35 @@ type server struct {
 	pb.CoffeeServerImpl
 }
 
+var (
+	// command-line options:
+	// gRPC server endpoint
+	grpcServerEndpoint = flag.String("grpc-server-endpoint", grpcPort, "gRPC server endpoint")
+)
+
+func runGrpcGateway() {
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// Register gRPC server endpoint
+	// Note: Make sure the gRPC server is running properly and accessible
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+	err := pb.RegisterCoffeeProtoHandlerFromEndpoint(ctx, mux, *grpcServerEndpoint, opts)
+
+	if err != nil {
+		log.Fatalf("failed to register endpoint: %v", err)
+	}
+
+	// Start HTTP server (and proxy calls to gRPC server endpoint)
+	if err := http.ListenAndServe(port, mux); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+}
+
 func runGrpcServer() {
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", grpcPort)
 
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -61,8 +99,7 @@ func runGrpcServer() {
 }
 
 func runClient() {
-	address := "localhost:50051"
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(grpcPort, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
