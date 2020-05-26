@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -14,6 +15,7 @@ var mysqlDatabase = os.Getenv("MYSQL_DATABASE")
 var mysqlUser = os.Getenv("MYSQL_USER")
 var mysqlPassword = os.Getenv("MYSQL_PASSWORD")
 var mysqlURL string
+var testDB *gorm.DB
 
 // Model is
 type Model struct {
@@ -23,9 +25,40 @@ type Model struct {
 }
 
 // Db is
-func Db() (db *gorm.DB, err error) {
-	db, err = gorm.Open("mysql", mysqlURL)
-	return db, err
+func Db() (*gorm.DB, error) {
+	test := os.Getenv("TRANSACTIONAL_TEST")
+	if test == "true" {
+		return TestDB(), nil
+	}
+	return gorm.Open("mysql", mysqlURL)
+}
+
+// TestDB is
+func TestDB() *gorm.DB {
+	if testDB == nil {
+		SetTestDB()
+	}
+	return testDB
+}
+
+// SetTestDB is
+func SetTestDB() {
+	mysqlDatabase = "coffeehub_test"
+	mysqlURL = fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", mysqlUser, mysqlPassword, mysqlHost, mysqlDatabase)
+	db, err := gorm.Open("mysql", mysqlURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Set testDB")
+	testDB = db
+}
+
+// StartTx is
+func StartTx(db *gorm.DB) *gorm.DB {
+	tx := db.Begin()
+	testDB = tx
+
+	return tx
 }
 
 func init() {

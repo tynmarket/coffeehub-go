@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/go-playground/validator"
 	"github.com/thoas/go-funk"
 )
 
@@ -11,15 +12,21 @@ type Coffee struct {
 	Model
 	SiteID        int64
 	Site          Site
-	Path          string
-	Country       string
-	AreaOrFactory string
-	Roast         int
-	Taste         string
+	Path          string `form:"path" binding:"required" validate:"required"`
+	Country       string `form:"countory" binding:"required"`
+	AreaOrFactory string `form:"area" binding:"required"`
+	Roast         int    `form:"roast" binding:"required"`
+	Taste         string `form:"taste" binding:"required" ja:"味わい"`
 }
 
 var coffeeRoastTextEn = []string{"unknown", "light", "cinnamon", "medium", "high", "city", "fullcity", "french", "italian"}
 var coffeeRoastText = []string{"記載なし", "ライト", "シナモン", "ミディアム", "ハイ", "シティ", "フルシティ", "フレンチ", "イタリアン"}
+
+// BeforeSave is
+func (c *Coffee) BeforeSave() error {
+	validate := validator.New()
+	return validate.Struct(c)
+}
 
 // CoffeeRoastValue is
 func CoffeeRoastValue(roast string) int {
@@ -28,12 +35,12 @@ func CoffeeRoastValue(roast string) int {
 
 // ArrivalDate is
 func (c *Coffee) ArrivalDate() string {
-	return c.Model.CreatedAt.Format("1月2日")
+	return c.CreatedAt.Format("1月2日")
 }
 
 // ArrivalMonth is
 func (c *Coffee) ArrivalMonth() int {
-	month := c.Model.CreatedAt.Month()
+	month := c.CreatedAt.Month()
 	return int(month)
 }
 

@@ -58,9 +58,19 @@ func CoffeesCreate(c *gin.Context) {
 		coffee.CreatedAt = now
 		coffee.UpdatedAt = now
 
+		coffee.Path = ""
 		pp.Printf("\ncoffee: %+v\n\n", &coffee)
 
 		db = db.Create(&coffee)
+		errors := db.GetErrors()
+
+		if len(errors) > 0 {
+			for _, err := range errors {
+				fmt.Printf("\nerr: %s\n\n", err.Error())
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+		}
 
 		c.JSON(200, "")
 	})
