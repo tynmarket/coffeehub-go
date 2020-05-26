@@ -2,11 +2,16 @@ package api
 
 import (
 	"fmt"
+	"net/http"
+	"time"
 	"tynmarket/coffeehub-go/model"
 	"tynmarket/coffeehub-go/serializer"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/jinzhu/gorm"
+	"github.com/k0kubun/pp"
 )
 
 // Coffee bind params
@@ -35,6 +40,29 @@ func CoffeesRoast(c *gin.Context) {
 		serialized := serializer.SerializeCoffees(coffees)
 
 		c.JSON(200, serialized)
+	})
+}
+
+// CoffeesCreate create action
+func CoffeesCreate(c *gin.Context) {
+	handle(c, func(db *gorm.DB) {
+		var coffee model.Coffee
+		if err := c.ShouldBindWith(&coffee, binding.Form); err != nil {
+			fmt.Println(err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.(validator.ValidationErrors).Translate(trans)})
+			return
+		}
+
+		coffee.SiteID = 1
+		now := time.Now()
+		coffee.CreatedAt = now
+		coffee.UpdatedAt = now
+
+		pp.Printf("\ncoffee: %+v\n\n", &coffee)
+
+		db = db.Create(&coffee)
+
+		c.JSON(200, "")
 	})
 }
 

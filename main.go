@@ -8,8 +8,8 @@ import (
 	"net"
 	"net/http"
 	"time"
-	"tynmarket/coffeehub-go/controller/api"
 	pb "tynmarket/coffeehub-go/proto"
+	"tynmarket/coffeehub-go/router"
 
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -44,11 +44,7 @@ const (
 
 func runGinServer() {
 	r := gin.Default()
-
-	apiV1 := r.Group("/api")
-	apiV1.GET("/coffees", api.Coffees)
-	apiV1.GET("/coffees/roast/:roast", api.CoffeesRoast)
-
+	r = router.Route(r)
 	r.Run()
 }
 
