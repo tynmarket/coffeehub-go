@@ -1,23 +1,52 @@
 #!/bin/sh
 
 DATABSE_URL="mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(127.0.0.1:3306)/$MYSQL_DATABASE"
+DATABSE_URL_TEST="mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(127.0.0.1:3306)/coffeehub_test"
 
 up() {
-  gmigrate -database $DATABSE_URL -path db/migration up
+  migrate -database $DATABSE_URL -path db/migration up
 }
 
 down() {
-  gmigrate -database $DATABSE_URL -path db/migration down
+  migrate -database $DATABSE_URL -path db/migration down
 }
 
-create() {
-  gmigrate create -ext sql -dir db/migration -seq create_$1
+seed() {
+  mysql -u root -p$MYSQL_ROOT_PASSWORD -h 127.0.0.1 $MYSQL_DATABASE -e "\
+    truncate table sites;
+    truncate table coffees;
+    insert into sites (name, url, created_at, updated_at) values ('name', 'url', '2020/05/25 16:16:43', '2020/05/25 16:16:43'); \
+    insert into coffees (site_id, path, country, area_or_factory, roast, taste, created_at, updated_at) \
+      values (1, '/SHOP/CO-CY001.html', 'コロンビア', 'フランコ・ロペス', 5, \
+        '口に含んだ時のやわらかな食感とやさしいオレンジのような印象はこの地域の特徴です。心地よい軽めの濃縮感、飲みこんだ後には長い甘みの余韻が続きます。全てが高いレベルで調和しているコーヒーです。', \
+        '2020/05/25 16:16:43', '2020/05/25 16:16:43'); \
+  "
+}
+
+setup() {
+  down
+  up
+  seed
+}
+
+test_db() {
+  mysqladmin -u root -p$MYSQL_ROOT_PASSWORD -h 127.0.0.1 --force drop coffeehub_test
+  mysqladmin -u root -p$MYSQL_ROOT_PASSWORD -h 127.0.0.1 create coffeehub_test
+  mysql -u root -p$MYSQL_ROOT_PASSWORD -h 127.0.0.1 -e "GRANT ALL ON coffeehub_test.* TO $MYSQL_USER;"
+  migrate -database $DATABSE_URL_TEST -path db/migration up
+}
+
+migration() {
+  migrate create -ext sql -dir db/migration -seq create_$1
 }
 
 help() {
     echo "\n up\n\n \
-dow\n\n \
-create table_name \n"
+down\n\n \
+seed\n\n \
+setup\n\n \
+test-db\n\n \
+migration table_name \n"
 }
 
 case "$1" in
@@ -27,8 +56,17 @@ case "$1" in
     "down")
         down
     ;;
-    "create")
-        create $2
+    "seed")
+        seed
+    ;;
+    "setup")
+        setup
+    ;;
+    "test-db")
+        test_db
+    ;;
+    "migration")
+        migration $2
     ;;
     *)
         help
